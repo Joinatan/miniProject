@@ -10,15 +10,21 @@ int counter = 0;
 void isr_routine(void)
 {
     /* SPI */
-    if()
+    if(IFS(1) & (1<<6))
+    {
+        PORTDCLR = (1<<1);
+        SPI2BUF = 0x0F;
+        PORTDSET = (1<<1);
+    }
     //clock
     if(IFS(0) & (1<<8))
     {
-        counter++;
-        if(counter = 10);
-        {
-        PORTDINV = (1<<1);
         IFSCLR(0) = (1<<8);
+        counter++;
+
+        if(counter == 10);
+        {
+        /* PORTDINV = (1<<1); */
         counter = 0;
         }
     }
@@ -31,6 +37,7 @@ void setup(void)
     SPI2CON = 0; //clear spi
     SPI2CONSET = (1<<28); //MSSEN not avaliable?
     SPI2CONSET = (1<<5); // master mode
+    SPI2CONSET = (1<<15); //SPI ON
 
     /* ------spi flags ---------- */
     IFSCLR(2) = (1<<6); //tx flag 
@@ -39,27 +46,33 @@ void setup(void)
     IPCSET(7) = (3<<24);
 
 
-    SPI2CONSET = (1<<15); //SPI ON
 
     /* gpio */
     TRISDCLR = (1<<1);
+    PORTD = 0;
 
 
     //timer
     T2CON = 0;
+    IFSCLR(0) = (1<<8); //cleara flaggan 
+    T2CONCLR = (1<<15);
     T2CONSET = PRESCALE << 4; //sätt prescale rätt
     PR2 = PR2VALUE; //timeoutvärde
-    IEC(0) = (1 << 8);
     TMR2 = 0; //nollställ timer
     T2CONSET = (1 << 15); //starta timer
+
+    IEC(0) = (1 << 8);
+    IECSET(0) = (1<<8); //satta for timer 2
+    IPCSET(2) = (5<<2); //hogsta prioritet
+    IPCSET(2) = 0x3; //hogsta prioritet
 
     enable_interrupt();
     return;
 }
 
 int main(){
-    PORTDSET = (1<<1);
     setup();
+    /* PORTDSET = (1<<1); */
 
     while(1)
     {};
