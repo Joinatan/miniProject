@@ -5,24 +5,81 @@
 #include <math.h>
 
 #define PRESCALE (4) //sätter timer2 till prescale 64 
-#define PR2VALUE ((80000000 / 16 ) / 30000 ) //100 ms
+#define PR2VALUE ((80000000 / 16 ) / 51100 ) //grund 50Hz
 #define bufSize (1024)
 #define maxAmp (0xfff)
 
-/* unsigned char buf[bufSize]; */
-unsigned int buf[bufSize];
+unsigned int sineBuf[bufSize];
+unsigned int triangleBuf[bufSize];
+unsigned int squareBuf[bufSize];
 int frame = 0;
 int *frameP = &frame;
+int frame2 = 0;
+int *frameP2 = &frame2;
 int dummyRecieve;
 int counter = 0;
+unsigned int mix = 0;
+char triangleFlag = 0;
+unsigned int triangle = 0;
 
-/* unsigned char fillBuffer(float x) */
-unsigned int fillBuffer(float x)
+unsigned int fillSineBuffer(float x)
 {
     unsigned int y = ( unsigned int ) (((sinf(x)*0.5)+0.5) * maxAmp) ;
-    /* unsigned char y = (unsigned char) (((sinf(x)*0.5)+0.5) * maxAmp) ; */
     return y;
 }
+unsigned int fillTriangleBuffer(int x)
+{
+    unsigned int y = 0;
+    if(x >= bufSize/2 )
+    {
+        triangle -= 7;
+        y = triangle;
+        triangleFlag = 1;
+        return y;
+    }
+    if(triangleFlag == 0)
+    {
+        triangle += 7;
+        y = triangle;
+        return y;
+    }
+    if(triangleFlag == 1)
+    {
+        triangle--;
+        y = triangle;
+        return y;
+    }
+    return y;
+}
+unsigned int fillSquareBuffer(int x)
+{
+    unsigned int y = 0;
+    y = maxAmp/2;
+    if(x >= bufSize/2 )
+    {
+        y = 0;
+        return y;
+    }
+    return y;
+}
+
+/* unsigned int mixer(int freq) */
+/* { */
+/*     unsigned int mix = (sineBuf[*frameP] * 0.5); */
+/*     mix += (sineBuf[*frameP2] * 0.5); */
+/*     (*frameP) += freq; */
+/*     (*frameP2) += freq*2; */
+/*             if(*frameP >= bufSize) */
+/*             { */
+/*                 *frameP = 0; */
+/*             } */
+/*             if(*frameP2 >= bufSize) */
+/*             { */
+/*                 *frameP2 = 0; */
+/*             } */
+
+/*     return mix; */
+/* } */
 
 void isr_routine(void)
 {
@@ -45,11 +102,14 @@ void isr_routine(void)
             counter++;
             IFSCLR(1) = (1<<6);
             PORTDCLR = (1<<1);
-            SPI2BUF = buf[*frameP];
-            (*frameP)+= 20;
+            /* SPI2BUF = buf[mix]; */
+            /* mix = mixer(14); */
+            SPI2BUF = triangleBuf[*frameP];
+            (*frameP)+= 2;
             if(frame >= bufSize)
             {
-                *frameP = 0;
+                int rest = frame - bufSize;
+                *frameP = rest;
             }
         }
         return;
@@ -63,9 +123,12 @@ void setup(void)
     int i = 0;
     for(i; i < bufSize; i++)
     {
-        buf[i] = fillBuffer(radians); //fill buffer
+        //------------fill sine
+        sineBuf[i] = fillSineBuffer(radians); //fill buffer
         radians += (2* 3.1415)/bufSize;
-        /* buf[i] = fillBuffer(i); */
+        //------------fill triangle
+        triangleBuf[i] = fillTriangleBuffer(i);
+        squareBuf[i] = fillSquareBuffer(i);
     }
 
     /* --------------SPI SETTINGS------------------- */
