@@ -11,9 +11,11 @@ extern float scoreBass [8][4];
 extern float scoreTenor [8][4];
 extern float scoreAlt2 [8][4];
 extern float scoreAlt [8][4];
+extern float scoreMelody [8][4];
 extern float scoreBassAmp [8][4];
 extern float scoreTenorAmp [8][4];
 extern float scoreAltAmp [8][4];
+extern float scoreMelodyAmp [8][4];
 void make_score(void);
 
 

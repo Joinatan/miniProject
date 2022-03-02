@@ -1,0 +1,2 @@
+PS2.c.o: PS2.c /opt/mcb32tools/include/pic32mx.h
+PS2.c /opt/mcb32tools/include/pic32mx.h :
