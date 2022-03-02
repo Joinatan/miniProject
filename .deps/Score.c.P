@@ -1,0 +1,2 @@
+Score.c.o: Score.c
+Score.c :
