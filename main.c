@@ -40,6 +40,10 @@ char ps_counter = 0;
 char have_i_sampled = 0;
 
 char key_pressed = 0;
+char *key_pressedP = &key_pressed;
+char note_off = 0;
+char note_off_counter = 0;
+/* char *note_offP = & */
 
 VOICE bass;
 VOICE tenor;
@@ -52,7 +56,7 @@ VOICE piano0;
 VOICE piano1;
 VOICE piano2;
 VOICE piano3;
-VOICE PIANO[5];
+VOICE PIANO[4];
 
 unsigned int fillSineBuffer(float x)
 {
@@ -100,16 +104,37 @@ void isr_routine(void)
 
                     ps_reg = (ps_reg<<1); //shifta left 
                     ps_reg |= (PORTE & 0x2)>>1; 
+                    //kolla om note off
+                    /* if(ps_counter == 5) */
+                    /* { */
+                    /*     if(~(ps_reg) & ~(0x0)) */
+                    /*     { */
+                    /*         /1* note_off_counter++; *1/ */
+                    /*         /1* ps_counter = 0; *1/ */
+                    /*         /1* ps_reg = 0; *1/ */
+                    /*         note_off = 1; */
+                    /*         /1* goto goto_note_off; *1/ */
+                    /*     } */
+                    /* if(note_off_counter == 1) */
+                    /* { */
+                    /*     note_off_counter++; */
+                    /*     note_off = 1; */
+                    /* }else if(note_off_counter == 2){ */
+                    /*     /1* note_off = 0; *1/ */
+                    /* } */
+
+                    /* } */
                 }
                 ps_counter ++;
             }
         }
 
         ps_counter = 0;
-        key_pressed = 1;
-        check_ps2_value(ps_reg);
+        check_ps2_value(ps_reg, PIANO, key_pressedP, &note_off);
+        /* mix2 = mixer2(PIANO, 1); */
         ps_reg = 0;
         }
+        /* goto_note_off: */
         /* slag = 0; */
         //cleara flaggan
         /* if(IFS(1) & (1<<7)) */
@@ -134,16 +159,18 @@ void isr_routine(void)
                 PORTDCLR = (1<<1);
 
                 if(key_pressed == 1){
-                    SPI2BUF = mix + mix2;
+                    SPI2BUF = mix2;
+                    mix2 = mixer2(PIANO, 4);
                     dummyRecieve = SPI2BUF;
+                    count = 0;
                 }else{
                     SPI2BUF = mix;
+                    mix = mixer(test, 5);
                     dummyRecieve = SPI2BUF;
                 }
 
+
                 /* if(beat == 0){ */
-                mix = mixer(test, 5);
-                mix2 = mixer(PIANO, 4);
                 /* }else{ */
                 /* } */
 
@@ -341,41 +368,41 @@ void isr_routine(void)
             return 0;
         }
 
-        unsigned int fillTriangleBuffer(int x)
-        {
-            unsigned int y = 0;
-            if(x >= bufSize/2 )
-            {
-                triangle -= 7;
-                y = triangle;
-                triangleFlag = 1;
-                return y;
-            }
-            if(triangleFlag == 0)
-            {
-                triangle += 7;
-                y = triangle;
-                return y;
-            }
-            if(triangleFlag == 1)
-            {
-                triangle--;
-                y = triangle;
-                return y;
-            }
-            return y;
-        }
-        unsigned int fillSquareBuffer(int x)
-        {
-            unsigned int y = 0;
-            y = maxAmp/2;
-            if(x >= bufSize/2 )
-            {
-                y = 0;
-                return y;
-            }
-            return y;
-        }
+        /* unsigned int fillTriangleBuffer(int x) */
+        /* { */
+        /*     unsigned int y = 0; */
+        /*     if(x >= bufSize/2 ) */
+        /*     { */
+        /*         triangle -= 7; */
+        /*         y = triangle; */
+        /*         triangleFlag = 1; */
+        /*         return y; */
+        /*     } */
+        /*     if(triangleFlag == 0) */
+        /*     { */
+        /*         triangle += 7; */
+        /*         y = triangle; */
+        /*         return y; */
+        /*     } */
+        /*     if(triangleFlag == 1) */
+        /*     { */
+        /*         triangle--; */
+        /*         y = triangle; */
+        /*         return y; */
+        /*     } */
+        /*     return y; */
+        /* } */
+        /* unsigned int fillSquareBuffer(int x) */
+        /* { */
+        /*     unsigned int y = 0; */
+        /*     y = maxAmp/2; */
+        /*     if(x >= bufSize/2 ) */
+        /*     { */
+        /*         y = 0; */
+        /*         return y; */
+        /*     } */
+        /*     return y; */
+        /* } */
         /* unsigned int mixer_old(int freq, unsigned int buf[]) */
         /* { */
         /*     unsigned int y = buf[frame] + buf[frame2]; */

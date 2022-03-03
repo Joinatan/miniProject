@@ -1,0 +1,2 @@
+VOICE.c.o: VOICE.c
+VOICE.c :

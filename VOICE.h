@@ -1,5 +1,5 @@
-#ifndef voice_h
-#define voice_h
+#ifndef VOICE_h
+#define VOICE_h
 
 /* struct VOICE; */
 typedef struct VOICE
@@ -14,18 +14,18 @@ typedef struct VOICE
 
 } VOICE;
 
-unsigned int make_sound(VOICE* self)
-{
-    (*self).y = (*self).buffer[(*self).position] * (*self).amp;
-    /* (*self).position +=  ((*self).freq) + 3; */
-    (*self).position += (unsigned int) ((*self).freq);
-    if((*self).position >= 1024*3)
-    {
-       unsigned int rest = (*self).position - (1024*3);
-       (*self).position = rest;
-       /* (*self).position = 0; */
-    }
-    return (*self).y;
-}
+unsigned int make_sound(VOICE* self);
+/* { */
+/*     (*self).y = (*self).buffer[(*self).position] * (*self).amp; */
+/*     /1* (*self).position +=  ((*self).freq) + 3; *1/ */
+/*     (*self).position += (unsigned int) ((*self).freq); */
+/*     if((*self).position >= 1024*3) */
+/*     { */
+/*        unsigned int rest = (*self).position - (1024*3); */
+/*        (*self).position = rest; */
+/*        /1* (*self).position = 0; *1/ */
+/*     } */
+/*     return (*self).y; */
+/* } */
 
 #endif
