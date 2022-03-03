@@ -31,12 +31,15 @@ int slag = 0;
 int dummyRecieve;
 int counter = 0;
 unsigned int mix = 0;
+unsigned int mix2 = 0;
 /* unsigned int dummyMix = 0; */
 char triangleFlag = 0;
 unsigned int triangle = 0;
-char ps_reg = 0;
+unsigned char ps_reg = 0;
 char ps_counter = 0;
 char have_i_sampled = 0;
+
+char key_pressed = 0;
 
 VOICE bass;
 VOICE tenor;
@@ -45,12 +48,31 @@ VOICE alt2;
 VOICE melody;
 VOICE test[5];
 
+VOICE piano0;
+VOICE piano1;
+VOICE piano2;
+VOICE piano3;
+VOICE PIANO[5];
+
 unsigned int fillSineBuffer(float x)
 {
     unsigned int y = ( unsigned int ) (((sinf(x)*0.5)+0.5) * maxAmp) ;
     return y;
 }
 unsigned int mixer(VOICE voiceArray[], int len)
+{
+    //mixer for att mixa ihop en array av VOICE
+    long int out = 0;
+    int i = 0;
+    for(i; i < len; i++) 
+    {
+        out += make_sound(&voiceArray[i]);
+    }
+    out = out/(i+1);
+    return (unsigned int) out;
+}
+
+unsigned int mixer2(VOICE voiceArray[], int len)
 {
     //mixer for att mixa ihop en array av VOICE
     long int out = 0;
@@ -77,13 +99,14 @@ void isr_routine(void)
                 if(ps_counter<9){
 
                     ps_reg = (ps_reg<<1); //shifta left 
-                    ps_reg |= ((PORTE>>1)&1); 
+                    ps_reg |= (PORTE & 0x2)>>1; 
                 }
                 ps_counter ++;
             }
         }
 
         ps_counter = 0;
+        key_pressed = 1;
         check_ps2_value(ps_reg);
         ps_reg = 0;
         }
@@ -110,11 +133,17 @@ void isr_routine(void)
                 /* IFSCLR(1) = (1<<6); */
                 PORTDCLR = (1<<1);
 
-                SPI2BUF = mix;
-                dummyRecieve = SPI2BUF;
+                if(key_pressed == 1){
+                    SPI2BUF = mix + mix2;
+                    dummyRecieve = SPI2BUF;
+                }else{
+                    SPI2BUF = mix;
+                    dummyRecieve = SPI2BUF;
+                }
 
                 /* if(beat == 0){ */
                 mix = mixer(test, 5);
+                mix2 = mixer(PIANO, 4);
                 /* }else{ */
                 /* } */
 
@@ -186,9 +215,9 @@ void isr_routine(void)
                 /* triangleBuf[i] = fillTriangleBuffer(i); */
                 /* squareBuf[i] = fillSquareBuffer(i); */
             }
-            i=0;
             /* bass = {sineBuf, 0, 0, 0, 0}; */
             /* tenor = {sineBuf, 0, 0, 0, 0}; */
+            /* ------------- voices for song --------------- */
             bass.buffer = sineBuf;
             bass.freq = 5;
             bass.amp = 0;
@@ -207,6 +236,17 @@ void isr_routine(void)
             test[2] = alt;
             test[3] = alt2;
             test[4] = melody;
+            /* ----------------------voices for piano------------------- */
+            PIANO[0] = piano0;
+            PIANO[1] = piano1;
+            PIANO[2] = piano2;
+            PIANO[3] = piano3;
+            i=0;
+            for(i; i<4; i++)
+            {
+                PIANO[i].buffer = sineBuf;
+                PIANO[i].amp = 1;
+            }
             /* VOICE bass; */
             /* bass.buffer = sineBuf; */
 
