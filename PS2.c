@@ -5,13 +5,17 @@
 unsigned int pressed = 0; 
 int voice_change = 0;
 int voice_array_index[12];
-root2 = 25;
+int root2 = 25;
 char noteOff = 0;
 void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, char *note_off)
 {
     if(voice_change > 3)
     {
         voice_change = 0;
+    }
+    if(voice_change < 0)
+    {
+        voice_change = 3;
     }
 
     switch(ps2)
@@ -29,6 +33,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(1);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if((~pressed) & 1)
             {
                 voice_array[voice_change].freq = root2 * C * 2;
@@ -46,6 +51,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(2);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 2)
             {
                 voice_array[voice_change].freq = root2 * Db * 2;
@@ -64,6 +70,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(4);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 4)
             {
                 voice_array[voice_change].freq = root2 * D * 2;
@@ -81,6 +88,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(8);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 8)
             {
                 voice_array[voice_change].freq = root2 * Eb * 2;
@@ -98,6 +106,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(16);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 16)
             {
                 voice_array[voice_change].freq = root2 * E * 2;
@@ -115,6 +124,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(32);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 32)
             {
                 voice_array[voice_change].freq = root2 * F * 2;
@@ -132,6 +142,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(64);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 64)
             {
                 voice_array[voice_change].freq = root2 * Gb * 2;
@@ -149,6 +160,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(128);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 128)
             {
                 voice_array[voice_change].freq = root2 * G * 2;
@@ -166,6 +178,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(256);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 256)
             {
                 voice_array[voice_change].freq = root2 * Ab * 2;
@@ -183,6 +196,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(512);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 512)
             {
                 voice_array[voice_change].freq = root2 * A * 2;
@@ -200,6 +214,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(1024);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 1024)
             {
                 voice_array[voice_change].freq = root2 * Bb * 2;
@@ -217,6 +232,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(2048);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & (2048))
             {
                 voice_array[voice_change].freq = root2 * B * 2;
@@ -234,6 +250,7 @@ void check_ps2_value(unsigned char ps2, VOICE voice_array[], char *song_pause, c
                 pressed &= ~(4096);
                 *note_off = 0;
                 noteOff = 0;
+                voice_change--;
             }else if(~pressed & 4096)
             {
                 voice_array[voice_change].freq = root2 * C * 4;
